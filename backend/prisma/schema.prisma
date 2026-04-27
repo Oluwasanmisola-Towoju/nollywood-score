@@ -4,10 +4,76 @@
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+model Movie {
+  id                   String      @id                     @default(cuid())
+  title                String 
+  slug                 String      @unique
+  year                 Int
+  director             String
+  cast                 String[]
+  genre                String
+  poster_url           String?
+  streaming_platform   String?
+  category             Category     @default(NEW_NOLLYWOOD)
+  synopsis             String?
+  avg_rating           Float        @default(0)
+  rating_count         Int          @default(0)
+  ratings              Rating[]
+  reviews              Review[]
+  created_at           DateTime     @default(now())
+  updated_at           DateTime     @updatedAt
+
+
+  @@map("movies")
+}
+
+model User {
+  id                  String        @id @default(cuid())
+  email               String        @unique
+  username            String        @unique
+  avatar_url          String?
+  ratings             Rating[]
+  reviews             Review[]
+  created_at          DateTime      @default(now())
+
+  @@map("users")
+}
+
+model Rating {
+  id                   String        @id          @default(cuid())
+  score                Int           
+  movie_id             String
+  user_id              String
+  movie                Movie         @relation(fields: [movie_id], references: [id])
+  user                 User          @relation(fields: [user_id], references: [id])
+  created_at           DateTime      @default(now())
+
+
+  @@unique([movie_id, user_id])
+  @@map("ratings")
+}
+
+model Review {
+  id                  String          @id          @default(cuid())
+  body                String        
+  movie_id            String
+  user_id             String
+  movie               Movie           @relation(fields: [movie_id], references: [id])
+  user                User            @relation(fields: [user_id], references: [id])
+  created_at          DateTime        @default(now())
+
+
+  @@map("reviews")
+}
+
+enum Category {
+  OLD_NOLLYWOOD
+  NEW_NOLLYWOOD
 }

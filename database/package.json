@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "format": "^0.2.2",
+    "prisma": "^7.8.0"
+  }
+}
