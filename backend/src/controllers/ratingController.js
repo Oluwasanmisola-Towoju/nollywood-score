@@ -142,11 +142,31 @@ const deleteRating = async (req, res, next) => {
         });
 
         // recalculate movie average here since deleting changes the rating's maths..
+        const { _avg, _count } = await prisma.rating.aggregate({
+            where: { movie_id: rating.movie_id },
+            _avg: { score: true },
+            _count: { score: true }
+        });
+
+        // pass the raw numbers through Bayesian formula
+        const newAvg = bayesianAverage(_avg.score || 0, _count.score);
+
+        // save the newly recalculated average back to the movie table
+        await prisma.movie.update({
+            where: {
+                id: rating.movie_id,
+            },
+            data: {
+                avg_rating: newAvg,
+                rating_count: _count.score
+            }
+        });
 
         res
         .json({
             success: true,
-            message: "Rating Removed"
+            message: "Rating Removed",
+            new_average: parseFloat(newAvg.toFixed(2)) // Send the updated average back to frontend
         });
     }
     catch (err) {
