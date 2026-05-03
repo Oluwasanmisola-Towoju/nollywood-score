@@ -1,5 +1,5 @@
 const { prisma } = require('../../config/dbHandler');
-const {paginate, paginatedResponse } = require('../utils/pagination');
+const {paginate, paginateResponse } = require('../utils/pagination');
 const { slugify } = require('../utils/slugify');
 
 const getAllMovies = async (req, res, next) => {
@@ -41,7 +41,7 @@ const getAllMovies = async (req, res, next) => {
         ]);
 
         // Send paginated data back to the user
-        res.json(paginatedResponse(movies, total, page, limit));
+        res.json(paginateResponse(movies, total, page, limit));
     }
     catch (err) {
         next(err);
@@ -144,7 +144,7 @@ const getByCategory = async (req, res, next) => {
         ]);
 
         res
-        .json(paginatedResponse(movies, total, page, limit));
+        .json(paginateResponse(movies, total, page, limit));
     }
     catch (err) {
         next(err);
