@@ -1,12 +1,12 @@
+const dotenv = require('dotenv');
+dotenv.config({ path: '../.env' });
+
 const express = require("express");
 const { connectDB, disconnectDB } = require('./config/dbHandler');
 const cors = require('cors');
 const helmet = require('helmet');
-const dotenv = require('dotenv');
-const { errorHandler } = require('./src/midlleware/errorHandler');
-const { rateLimiter } = require('./src/middleware/rateLimiter');
-
-dotenv.config();
+const { errorHandler } = require('./src/middleware/errorHandler');
+const { rateLimit, rateLimiter, ratingLimiter } = require('./src/middleware/rateLimiter');
 
 const app = express();
 connectDB();
@@ -21,15 +21,15 @@ app.use(rateLimiter);
 
 // API Routes
 app.use('/api/movies', require('./src/routes/movieRoutes'));
-app.use('./api/ratings', require('./src/routes/ratingRoutes'));
-app.use('./api/reviews', require('./src/routes/reviewRoutes'));
+app.use('/api/ratings', require('./src/routes/ratingRoutes'));
+app.use('/api/reviews', require('./src/routes/reviewRoutes'));
 app.use('/api/genres', require('./src/routes/genreRoutes'));
 app.use('/api/admin', require('./src/routes/adminRoutes'));
 app.use('/api/search', require('./src/routes/searchRoutes'));
 
 app.get('/api/check', (req, res) => res.json({
     status: 'ok',
-    uptime: process.uptime() 
+    uptime: process.uptime()
 }));
 
 app.use(errorHandler);
