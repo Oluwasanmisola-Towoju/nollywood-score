@@ -19,4 +19,4 @@ const ratingLimiter = rateLimit({
     }
 });
 
-module.exports = { rateLimit, ratingLimiter };
+module.exports = { rateLimiter, ratingLimiter };
