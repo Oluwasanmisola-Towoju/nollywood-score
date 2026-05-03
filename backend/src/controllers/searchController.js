@@ -1,5 +1,5 @@
 const { prisma } = require('../../config/dbHandler');
-const { paginate, paginatedResponse } = require('../utils/pagination');
+const { paginate, paginateResponse } = require('../utils/pagination');
 
 const search = async (req, res, next) => {
     try {
@@ -89,7 +89,7 @@ const search = async (req, res, next) => {
         ]);
 
         // Send the perfectly formatted paginated response
-        res.json(paginatedResponse(results, total, page, limit));
+        res.json(paginateResponse(results, total, page, limit));
     }
     catch (err) {
         next(err);
