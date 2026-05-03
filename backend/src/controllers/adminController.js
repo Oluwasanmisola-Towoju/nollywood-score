@@ -9,10 +9,10 @@ const listAllMovies = async (req, res, next) => {
         });
 
         res
-        .json({
-            success: true,
-            data: movies
-        });
+            .json({
+                success: true,
+                data: movies
+            });
     }
     catch (err) {
         next(err);
@@ -23,7 +23,7 @@ const approveMovie = async (req, res, next) => {
     try {
         const movie = await prisma.movie.update({
             where: {
-                id: parseInt(req.params.id),
+                id: req.params.id,
             },
             data: {
                 approved: true  // only updates the 'approves' boolean
@@ -31,10 +31,10 @@ const approveMovie = async (req, res, next) => {
         });
 
         res
-        .json({
-            success: true,
-            data: movie
-        });
+            .json({
+                success: true,
+                data: movie
+            });
     }
     catch (err) {
         next(err);
@@ -45,7 +45,7 @@ const removeMovie = async (req, res, next) => {
     try {
         await prisma.movie.delete({
             where: {
-                id: parseInt(req.params.id)
+                id: req.params.id
             }
         });
 
@@ -79,10 +79,10 @@ const getDashboardStats = async (req, res, next) => {
             }
         });
     }
-    catch(err) {
+    catch (err) {
         next(err);
     }
 };
 
-module.exports = { listAllMovies, approveMovie, removeMovie, getDashboardStats }; 
+module.exports = { listAllMovies, approveMovie, removeMovie, getDashboardStats };
 

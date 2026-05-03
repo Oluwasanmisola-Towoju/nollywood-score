@@ -4,7 +4,7 @@ const getReviewsForMovie = async (req, res, next) => {
     try {
         const reviews = await prisma.review.findMany({
             where: {
-                movie_id: parseInt(req.params.movieId)
+                movie_id: req.params.movieId
             },
             include: {
                 user: {
@@ -18,12 +18,12 @@ const getReviewsForMovie = async (req, res, next) => {
                 created_at: 'desc'
             }
         });
-        
+
         res
-        .json({
-            success: true,
-            data: reviews
-        });
+            .json({
+                success: true,
+                data: reviews
+            });
     }
     catch (err) {
         next(err);
@@ -36,11 +36,11 @@ const submitReview = async (req, res, next) => {
 
         if (!body || body.trim().length < 10) {
             return res
-            .status(400)
-            .json({
-                success: false,
-                error: 'Review must be at least 10 characters'
-            });
+                .status(400)
+                .json({
+                    success: false,
+                    error: 'Review must be at least 10 characters'
+                });
         }
 
         const review = await prisma.review.create({
@@ -50,13 +50,13 @@ const submitReview = async (req, res, next) => {
                 user_id: req.user.id
             }
         });
-        
+
         res
-        .status(201)
-        .json({
-            success: true,
-            data: review
-        });
+            .status(201)
+            .json({
+                success: true,
+                data: review
+            });
     }
     catch (err) {
         next(err);
@@ -67,28 +67,28 @@ const deleteReview = async (req, res, next) => {
     try {
         const review = await prisma.review.findUnique({
             where: {
-                id: parseInt(req.params.id)
+                id: req.params.id
             }
         });
 
         if (!review) {
             return res
-            .status(404)
-            .json({
-                success: false,
-                error: "Review not found"
-            });
+                .status(404)
+                .json({
+                    success: false,
+                    error: "Review not found"
+                });
         }
 
         if (review.user_id !== req.user.id && !req.user.is_admin) {
             return res
-            .status(403)
-            .json({
-                success: false,
-                error: 'Not your review'
-            });
+                .status(403)
+                .json({
+                    success: false,
+                    error: 'Not your review'
+                });
         }
-        
+
         // safe to delete
         await prisma.review.delete({
             where: {
@@ -97,10 +97,10 @@ const deleteReview = async (req, res, next) => {
         });
 
         res
-        .json({
-            success: true,
-            message: 'Review Deleted'
-        });
+            .json({
+                success: true,
+                message: 'Review Deleted'
+            });
     }
     catch (err) {
         next(err);

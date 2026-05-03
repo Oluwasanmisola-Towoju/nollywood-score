@@ -1,18 +1,18 @@
 const { prisma } = require('../../config/dbHandler');
-const {paginate, paginateResponse } = require('../utils/pagination');
+const { paginate, paginateResponse } = require('../utils/pagination');
 const { slugify } = require('../utils/slugify');
 
 const getAllMovies = async (req, res, next) => {
-    try{
+    try {
         // Extract pagination data
         const { page, limit, skip } = paginate(req.query);
 
         // Extract search filters from URL query
-        const {genre, year, platform } = req.query;
+        const { genre, year, platform } = req.query;
 
         // Build search query with optional filters dynamically
         const where = {
-            ...(genre  &&  {
+            ...(genre && {
                 genre: {
                     contains: genre,
                     mode: 'insensitive'
@@ -21,21 +21,21 @@ const getAllMovies = async (req, res, next) => {
             ...(year && {
                 year: parseInt(year)
             }),
-            ...(platform  && {
+            ...(platform && {
                 streaming_platform: {
                     contains: platform,
                     mode: 'insensitive'
                 }
             })
         };
-        
+
         // Run both queries simultaneously 
         const [movies, total] = await Promise.all([
             prisma.movie.findMany({
                 where,
                 skip,
                 take: limit,
-                orderBy: {avg_rating: 'desc'} // show best movies first
+                orderBy: { avg_rating: 'desc' } // show best movies first
             }),
             prisma.movie.count({ where })
         ]);
@@ -49,7 +49,7 @@ const getAllMovies = async (req, res, next) => {
 };
 
 const getMovieBySlug = async (req, res, next) => {
-    try{
+    try {
         const movie = await prisma.movie.findUnique({
             where: {
                 slug: req.params.slug
@@ -74,18 +74,18 @@ const getMovieBySlug = async (req, res, next) => {
 
         if (!movie) {
             return res
-            .status(404)
-            .json({
-                success: false,
-                error: 'Movie not found'
-            });
+                .status(404)
+                .json({
+                    success: false,
+                    error: 'Movie not found'
+                });
         }
 
         res
-        .json({
-            success: true,
-            data: movie
-        });
+            .json({
+                success: true,
+                data: movie
+            });
     }
     catch (err) {
         next(err);
@@ -93,7 +93,7 @@ const getMovieBySlug = async (req, res, next) => {
 };
 
 const getTrending = async (req, res, next) => {
-    try{
+    try {
         const movies = await prisma.movie.findMany({
             // only consider movies with at least 3 ratings 
             where: {
@@ -106,16 +106,16 @@ const getTrending = async (req, res, next) => {
                 avg_rating: 'desc',
             },
             { // then by most ratings...
-               rating_count: 'desc' 
+                rating_count: 'desc'
             }],
             take: 10
         });
 
         res
-        .json({
-            success: true,
-            data: movies
-        });
+            .json({
+                success: true,
+                data: movies
+            });
     }
     catch (err) {
         next(err);
@@ -123,7 +123,7 @@ const getTrending = async (req, res, next) => {
 }
 
 const getByCategory = async (req, res, next) => {
-    try{
+    try {
         // make parameter match enum in db correctly
         const cat = req.params.cat.toUpperCase();
         const { page, limit, skip } = paginate(req.query);
@@ -134,7 +134,7 @@ const getByCategory = async (req, res, next) => {
                 },
                 skip,
                 take: limit,
-                orderBy: { year: 'desc'}
+                orderBy: { year: 'desc' }
             }),
             prisma.movie.count({
                 where: {
@@ -144,7 +144,7 @@ const getByCategory = async (req, res, next) => {
         ]);
 
         res
-        .json(paginateResponse(movies, total, page, limit));
+            .json(paginateResponse(movies, total, page, limit));
     }
     catch (err) {
         next(err);
@@ -152,7 +152,7 @@ const getByCategory = async (req, res, next) => {
 }
 
 const createMovie = async (req, res, next) => {
-    try{
+    try {
         const { title, year, director, cast, genre, poster_url, streaming_platform, synopsis } = req.body;
         const movie = await prisma.movie.create({
             data: {
@@ -170,11 +170,11 @@ const createMovie = async (req, res, next) => {
         });
 
         res
-        .status(201)
-        .json({
-            success: true,
-            data: movie
-        });
+            .status(201)
+            .json({
+                success: true,
+                data: movie
+            });
     }
     catch (err) {
         next(err);
@@ -182,18 +182,18 @@ const createMovie = async (req, res, next) => {
 };
 
 const updateMovie = async (req, res, next) => {
-    try{
+    try {
         const movie = await prisma.movie.update({
             where: {
-                id: parseInt(req.params.id),
+                id: req.params.id,
             },
             data: req.body
         });
         res
-        .json({
-            success: true,
-            data: movie
-        });
+            .json({
+                success: true,
+                data: movie
+            });
     }
     catch (err) {
         next(err);
@@ -201,18 +201,18 @@ const updateMovie = async (req, res, next) => {
 };
 
 const deleteMovie = async (req, res, next) => {
-    try{
+    try {
         await prisma.movie.delete({
             where: {
-                id: parseInt(req.params.id)
+                id: req.params.id
             }
         });
 
         res
-        .json({
-            success: true,
-            message: 'Movie deleted'
-        });
+            .json({
+                success: true,
+                message: 'Movie deleted'
+            });
     }
     catch (err) {
         next(err);
